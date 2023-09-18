@@ -6,10 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
 
+import java.util.*;
 /**
  * TODO: You will need to write your own endpoints and handlers for your controller using Spring. The endpoints you will need can be
  * found in readme.md as well as the test cases. You be required to use the @GET/POST/PUT/DELETE/etc Mapping annotations
@@ -17,16 +15,13 @@ import org.springframework.context.ApplicationContext;
  * refer to prior mini-project labs and lecture materials for guidance on how a controller may be built.
  */
 @Controller
+@RequestMapping("")
 public class SocialMediaController {
-    
-    public AccountService accountService;
-    
-    public MessageService messageService;
     @Autowired
-    public SocialMediaController(AccountService accountService,MessageService messageService){
-        this.accountService=accountService;
-        this.messageService=messageService;
-    }
+    public AccountService accountService;
+    @Autowired
+    public MessageService messageService;
+    
     
 /**
  * As a user, I should be able to create a new Account on the endpoint
@@ -38,12 +33,12 @@ public class SocialMediaController {
 - If the registration is not successful for some other reason, the response status should be 400. (Client error)
 
  */
-@PostMapping("register")
+@PostMapping("/register")
 public @ResponseBody ResponseEntity<Account> registerHandler(@RequestBody Account account){
     if (account.getUsername().trim().equals("") || account.getPassword().length()<4){
         return ResponseEntity.status(400).body(null);
     }
-    Account newAccount = accountService.addAccount(account);
+    Account newAccount =accountService.addAccount(account);
     if (newAccount !=null){
         return ResponseEntity.status(200).body(newAccount);
     }else{
@@ -57,8 +52,8 @@ public @ResponseBody ResponseEntity<Account> registerHandler(@RequestBody Accoun
  If successful, the response body should contain a JSON of the account in the response body, including its account_id. The response status should be 200 OK, which is the default.
 - If the login is not successful, the response status should be 401. (Unauthorized)
      */
-    @PostMapping("login")
-    public @ResponseBody ResponseEntity<Account> loginHandler(@RequestBody Account account){
+    @PostMapping("/login")
+    public @ResponseBody ResponseEntity<Account> postLoginHandler(@RequestBody Account account){
           Account verifiedAccount = accountService.verifiedAccount(account);
           if (verifiedAccount != null){
             return ResponseEntity.status(200).body(verifiedAccount);
@@ -72,13 +67,41 @@ public @ResponseBody ResponseEntity<Account> registerHandler(@RequestBody Accoun
  The response status should be 200, which is the default. The new message should be persisted to the database.
 If the creation of the message is not successful, the response status should be 400. (Client error)
  */
-@PostMapping("messages")
-public @ResponseBody ResponseEntity<Message> messageHandler(@RequestBody Message message){
+@PostMapping("/messages")
+public @ResponseBody ResponseEntity<Message> postMessageHandler(@RequestBody Message message){
        Message postMessage = messageService.postMessage(message);
        if (postMessage != null){
         return ResponseEntity.status(200).body(postMessage);
        }else{
         return ResponseEntity.status(400).build();
        }
+}
+/**
+ * As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages.
+
+- The response body should contain a JSON representation of a list containing all messages retrieved from the database. 
+It is expected for the list to simply be empty if there are no messages.
+ The response status should always be 200, which is the default.
+
+ */
+@GetMapping("/messages")
+public @ResponseBody ResponseEntity<List<Message>> getAllMessageHandler(){
+        List<Message> listOfMessage = messageService.getMessage();
+        return ResponseEntity.status(200).body(listOfMessage);
+}
+/**
+ * As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages/{message_id}.
+
+- The response body should contain a JSON representation of the message identified by the message_id
+. It is expected for the response body to simply be empty if there is no such message. 
+The response status should always be 200, which is the default.
+ */
+@GetMapping("/messages/{message_id}")
+public @ResponseBody ResponseEntity<Message> getMessageByIdHandler(@PathVariable int message_id){
+    Message messageById = messageService.getMessageById(message_id);
+    if (messageById !=null){
+        return ResponseEntity.status(200).body(messageById);
+    }
+    return ResponseEntity.status(200).build();
 }
 }

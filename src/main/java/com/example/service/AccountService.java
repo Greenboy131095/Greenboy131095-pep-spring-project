@@ -1,4 +1,5 @@
 package com.example.service;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.example.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +10,8 @@ import java.util.List;
 @Service
 @Transactional
 public class AccountService {
-    
-    AccountRepository accountRepository;
     @Autowired
-    public AccountService(AccountRepository accountRepository){
-         this.accountRepository=accountRepository;
-    }
+    AccountRepository accountRepository;
    
     
     public Account addAccount(Account account){
@@ -25,7 +22,7 @@ public class AccountService {
                 return null;
             }
         }
-        return accountRepository.save(account);
+        return (Account)accountRepository.save(account);
     }
     public Account verifiedAccount (Account account){
         List<Account> listOfAccount= accountRepository.findAll();
