@@ -65,4 +65,17 @@ public class MessageService {
         }
         return listOfUpdatedMessage;
     }
+    public Message deleteMessageByIdHandler(int message_id){
+        Optional<Message> optionalMessage = messageRepository.findById(message_id);
+        if (optionalMessage.isPresent()){
+            
+            Message deletedMessage = optionalMessage.get();
+
+            messageRepository.deleteById(message_id);
+            return deletedMessage;
+        }else{
+            return null;
+        }
+    }
+    
 }

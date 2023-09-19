@@ -121,7 +121,7 @@ public @ResponseBody ResponseEntity<Integer> patchMessageHandler(@PathVariable i
         String[] lines = message.getMessage_text().split("\r|\n");
         return ResponseEntity.status(200).body(lines.length);
     }else{
-        return ResponseEntity.status(400).build();
+        return ResponseEntity.status(400).body(0);
     }
 
 }
@@ -136,5 +136,24 @@ It is expected for the list to simply be empty if there are no messages. The res
 public @ResponseBody ResponseEntity<List<Message>>  getMessagesByAccountId(@PathVariable int account_id){
     List<Message> listofMessage= messageService.getMessagesByAccountId(account_id);
     return ResponseEntity.status(200).body(listofMessage);
+}
+/**
+ * As a User, I should be able to submit a DELETE request on the endpoint DELETE localhost:8080/messages/{message_id}.
+
+- The deletion of an existing message should remove an existing message from the database.
+ If the message existed, the response body should contain the number of rows updated (1). 
+The response status should be 200, which is the default.
+- If the message did not exist, the response status should be 200, but the response body should be empty. This is because the DELETE verb is intended to be idempotent, 
+ie, multiple calls to the DELETE endpoint should respond with the same type of response.
+ */
+@DeleteMapping("/messages/{message_id}")
+public @ResponseBody ResponseEntity<Integer> deleteMessageByIdHandler(@PathVariable int message_id){
+    Message deletedMessage = messageService.deleteMessageByIdHandler(message_id);
+    if (deletedMessage !=null){
+        String[] lines = deletedMessage.getMessage_text().split("\r|\n");
+        return ResponseEntity.status(200).body(lines.length);
+    }else{
+        return ResponseEntity.status(200).body(0);
+    }
 }
 }
