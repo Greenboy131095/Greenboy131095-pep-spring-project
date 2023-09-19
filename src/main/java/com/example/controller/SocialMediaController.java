@@ -104,4 +104,37 @@ public @ResponseBody ResponseEntity<Message> getMessageByIdHandler(@PathVariable
     }
     return ResponseEntity.status(200).build();
 }
+/**
+ * As a user, I should be able to submit a PATCH request on the endpoint PATCH localhost:8080/messages. 
+ * The request body should contain a new message_text values to replace the message identified by message_id.
+ *  The request body can not be guaranteed to contain any other information.
+
+- The update of a message should be successful if and only if the message id already exists and the new message_text is not blank and is not over 255 characters.
+ If the update is successful, the response body should contain the number of rows updated (1), and the response status should be 200, which is the default. 
+ The message existing on the database should have the updated message_text.
+- If the update of the message is not successful for any reason, the response status should be 400. (Client error)
+ */
+@PatchMapping("/messages/{message_id}")
+public @ResponseBody ResponseEntity<Integer> patchMessageHandler(@PathVariable int message_id,@RequestBody Message updatedMessage){
+    Message message = messageService.patchMessageById(updatedMessage,message_id);
+    if (message!=null){
+        String[] lines = message.getMessage_text().split("\r|\n");
+        return ResponseEntity.status(200).body(lines.length);
+    }else{
+        return ResponseEntity.status(400).build();
+    }
+
+}
+/**
+ * As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/accounts/{account_id}/messages.
+
+- The response body should contain a JSON representation of a list containing all messages posted by a particular user, which is retrieved from the database. 
+It is expected for the list to simply be empty if there are no messages. The response status should always be 200, which is the default.
+
+ */
+@GetMapping("/accounts/{account_id}/messages")
+public @ResponseBody ResponseEntity<List<Message>>  getMessagesByAccountId(@PathVariable int account_id){
+    List<Message> listofMessage= messageService.getMessagesByAccountId(account_id);
+    return ResponseEntity.status(200).body(listofMessage);
+}
 }

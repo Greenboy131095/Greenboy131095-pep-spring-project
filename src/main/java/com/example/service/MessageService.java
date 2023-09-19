@@ -42,4 +42,27 @@ public class MessageService {
             return null;
           }
     }
+    public Message patchMessageById(Message message, int message_id){
+        if (message.getMessage_text().trim()=="" || message.getMessage_text().length()>254){
+            return null;
+        }
+        Optional<Message> optionalMessage = messageRepository.findById(message_id);
+        if (optionalMessage.isPresent()){
+            Message updatedMessage = optionalMessage.get();
+            updatedMessage.setMessage_text(message.getMessage_text());
+            return messageRepository.save(updatedMessage);
+        }else{
+            return null;
+        }
+    }
+    public List<Message> getMessagesByAccountId(int account_id){
+        List<Message> listOfMessage = messageRepository.findAll();
+        List<Message> listOfUpdatedMessage = new ArrayList();
+        for (Message message : listOfMessage){
+            if (message.getPosted_by().equals(account_id)){
+                listOfUpdatedMessage.add(message);
+            }
+        }
+        return listOfUpdatedMessage;
+    }
 }
